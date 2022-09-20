@@ -1,16 +1,16 @@
 /*
  *  Programa de ejemplo para utilizar el módulo dimmer con cruce con cero, con Wemos y Fuente integradas. 
- *
  *  Más info:
  *  https://github.com/lu4ult/dimmer-modulo-desarrollo
  *
+ *
+ *  En este ejemplo utilizamos un potenciómetro para variar la intensidad de la lámpara.
  *  Video ejemplo:
- *  https://youtube.com/shorts/cVwYHIf1eo4
+ *  https://youtube.com/shorts/EDdIExiOSi4
  *
 */
 
-int espera = 20;
-byte brilloDimmer = 0;
+byte adcValor,adcValorAnterior, dimming;
 
 void setup() {
   Serial.begin(115200);
@@ -21,18 +21,13 @@ void setup() {
 }
 
 void loop() {
+  adcValor = map(analogRead(A0),0,1024,128,0);
+  if(adcValor != adcValorAnterior)  {              //Sólo actualizamos el valor del dimmer cuando realmente cambió la lectura del ADC
+    adcValorAnterior = adcValor;
 
-  for(int i=0;i<128;i++){
-    brilloDimmer = i;
-    delay(espera);
+    Serial.println("ADC: "+String(adcValor));
+    dimming = adcValor;
   }
-  delay(500);
-
-  for(int i=128;i>0;i--){
-    brilloDimmer = i;
-    delay(espera);
-  }
-  delay(500);
 }
 
 
@@ -42,14 +37,14 @@ void zeroCrosssInt()  {  // Esta interrupción se ejecuta en el cruce por cero, 
   //Entonces medio ciclo= 10mS = 10000uS
   //(10000uS - 10uS) / 128 = 75 (aproximadamente), 10uS propagación 
 
-  if(brilloDimmer<10 or brilloDimmer>120) {
-    if(brilloDimmer<10)
+  if(dimming<10 or dimming>120) {
+    if(dimming<10)
       digitalWrite(14, HIGH);
-    if(brilloDimmer>120)
+    if(dimming>120)
       digitalWrite(14, LOW);
   }
   else {
-    delayMicroseconds(75*brilloDimmer);
+    delayMicroseconds(75*dimming);
     digitalWrite(14, HIGH);
     delayMicroseconds(10);
     digitalWrite(14, LOW);
