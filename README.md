@@ -22,6 +22,10 @@ Fotos:
 ![Foto 3](./Fotos/3.jpg)
 ![Foto 4](./Fotos/4.jpg)
 
+<h4>Videos de ejemplo:</h4>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLodnFftew_0cyu2CQ-WdjRTRBlGxLo3Lw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 <h3>Bibliotecas (librerías)</h3>
 Todos los ejemplos utilizan una función simple para hacer el disparo del triac dentro de una interrupción disparada por el detector de cruce por cero:
@@ -58,4 +62,7 @@ Ya que al correr cualquier ejemplo se activa el watchdog con la descripción "IS
 <a href="https://github.com/fabianoriccardi/dimmable-light" target="_blank">https://github.com/fabianoriccardi/dimmable-light</a>
 
 Esta biblioteca funciona bien y la mantienen actualizada pero en algunos puntos de brillo presenta "flicks" o "parpadeos".
+
+
+
 
