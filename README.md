@@ -24,7 +24,7 @@ Fotos:
 
 <h4>Videos de ejemplo:</h4>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLodnFftew_0cyu2CQ-WdjRTRBlGxLo3Lw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<a href="https://youtube.com/playlist?list=PLodnFftew_0cyu2CQ-WdjRTRBlGxLo3Lw" target="_blank">https://youtube.com/playlist?list=PLodnFftew_0cyu2CQ-WdjRTRBlGxLo3Lw</a>
 
 
 <h3>Bibliotecas (librerías)</h3>
