@@ -48,6 +48,7 @@ Si biene existen librerías que se pueden utilizar esta es la forma que mejores 
 Las librerías son:
 
 <a href="https://github.com/RobotDynOfficial/RBDDimmer" target="_blank">https://github.com/RobotDynOfficial/RBDDimmer</a>
+
 Esta biblioteca funciona para Core 2.4, sin embargo no tiene actividad en los últimos años y para las versiones más recientes del Core de ESP (actualmente 3.0.2) requiere agregar:
 ICACHE_RAM_ATTR
 
@@ -55,5 +56,6 @@ Ya que al correr cualquier ejemplo se activa el watchdog con la descripción "IS
 
 
 <a href="https://github.com/fabianoriccardi/dimmable-light" target="_blank">https://github.com/fabianoriccardi/dimmable-light</a>
+
 Esta biblioteca funciona bien y la mantienen actualizada pero en algunos puntos de brillo presenta "flicks" o "parpadeos".
 
