@@ -1,9 +1,10 @@
 /*
  *  Programa de ejemplo para utilizar el módulo dimmer con cruce con cero, con Wemos y Fuente integradas. 
  *  
- *  En este ejemplo simularemos la salida y puesta del sol, dimerizando una lámpara.
- *  Para ello el wemos se conecta a internet y obtiene la fecha y hora a través de NTP, luego calcula las horas de salida y puesta del sol (sunRise y sunSet)
+ *  En este ejemplo simularemos la salida y puesta del sol, dimerizando una lámpara a la hora de la salida y puesta real del sol.
+ *  Para ello el wemos se conecta a internet y obtiene la fecha y hora a través de NTP, luego calcula las horas de salida y puesta del sol (sunRise y sunSet).
  *  También definimos cuánto tiempo demorará de pasar de 0 a 100% y visceversa para el momento de sunrise y sunset respectivamente.
+ *  Una vez alcanzada la hora de la salida del sol empieza a aumentar el brillo durante el periodo en minutos que hayamos definido, y visceversa al momento de la puesta del sol (sunset).
  *
  *
  *  Opcional: display LCD por I2C.
