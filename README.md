@@ -48,7 +48,7 @@ void zeroCrosssInt()  {
 }
 ```
 
-Si biene existen librerías que se pueden utilizar esta es la forma que mejores resultados nos ha dado (más estable y sin parpadeos)
+Si bien existen librerías que se pueden utilizar esta es la forma que mejores resultados nos ha dado (más estable y sin parpadeos)
 Las librerías son:
 
 <a href="https://github.com/RobotDynOfficial/RBDDimmer" target="_blank">https://github.com/RobotDynOfficial/RBDDimmer</a>
