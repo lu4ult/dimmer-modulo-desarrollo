@@ -47,7 +47,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", -3*60*60);       //-3 ya que en Arg
 * y de 100% al 0% al momento de la puesta del sol.
 * Valores posibles: 1,2,4,5,10,20,25,50,100 (todos los que 100/tiempoRampo no tiene resto, otros valores se pueden utilizar con resultado inexacto)
 */
-byte tiempoRampa=25;
+byte tiempoRampa=20;
 
 /*Para facilitar las cuentas no utilizaremos la hora y minuto de la salida y puesta del sol, sino lo que llamaremos "momento",
  * tal que:
@@ -183,7 +183,7 @@ void loop() {
      Serial.print(":");
      Serial.println((int) today[tl_minute]);
      momentoSunrise = today[tl_hour]*60 + today[tl_minute];
-     momentoSunrise = 18*60 + 15;                                       //Para usar un valor falso de salida del sol y poder probar el funcionamiento del programa
+     //momentoSunrise = 14*60 + 0;                                       //Para usar un valor falso de salida del sol y poder probar el funcionamiento del programa
      }
 
      if(tardis.SunSet(today))  {
@@ -192,7 +192,7 @@ void loop() {
      Serial.print(":");
      Serial.println((int) today[tl_minute]);
      momentoSunset = today[tl_hour]*60 + today[tl_minute];
-     //momentoSunset = 16*60 + 15;                                        //Para usar un valor falso de puesta del sol y poder probar el funcionamiento del programa
+     //momentoSunset = 18*60 + 15;                                        //Para usar un valor falso de puesta del sol y poder probar el funcionamiento del programa
      }
 
     Serial.println("Momento Sunrise: "+String(momentoSunrise));
