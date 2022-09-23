@@ -1,4 +1,4 @@
-#define WIFI_NAME "Mi WiFi"
-#define WIFI_PASS "Mi contraseña WiFi"
-#define LATITUD -34.5922485
-#define LONGITUD -58.3751013
+#define WIFI_NAME "lu4ult"
+#define WIFI_PASS "lucaprodan"
+#define LATITUD -31.4198739
+#define LONGITUD -64.1844141

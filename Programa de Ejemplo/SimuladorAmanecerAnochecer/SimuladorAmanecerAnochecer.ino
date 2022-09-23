@@ -1,16 +1,17 @@
 /*
  *  Programa de ejemplo para utilizar el módulo dimmer con cruce con cero, con Wemos y Fuente integradas. 
- *  
+ *
  *  En este ejemplo simularemos la salida y puesta del sol, dimerizando una lámpara a la hora de la salida y puesta real del sol.
  *  Para ello el wemos se conecta a internet y obtiene la fecha y hora a través de NTP, luego calcula las horas de salida y puesta del sol (sunRise y sunSet).
  *  También definimos cuánto tiempo demorará de pasar de 0 a 100% y visceversa para el momento de sunrise y sunset respectivamente.
  *  Una vez alcanzada la hora de la salida del sol empieza a aumentar el brillo durante el periodo en minutos que hayamos definido, y visceversa al momento de la puesta del sol (sunset).
  *
- *
  *  Opcional: display LCD por I2C.
  *  Más info:
  *  https://github.com/lu4ult/dimmer-modulo-desarrollo
  *
+ *  Video en Youtube:
+ *  https://youtu.be/x4mMS1b3m24
  *
 */
 
@@ -25,7 +26,7 @@
  */
 
 
-//#define LCD                   //Descomente esta línea para utilizar el display LCD por I2C
+#define LCD                   //Descomente esta línea para utilizar el display LCD por I2C
 
 #include "credenciales.h"       //En este archivo configuramos el nombre y contraseña de nuestra red wifi, además de la latitud y longitud para calcular la salida y puesta del sol.
 #include <ESP8266WiFi.h>
@@ -46,7 +47,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", -3*60*60);       //-3 ya que en Arg
 * y de 100% al 0% al momento de la puesta del sol.
 * Valores posibles: 1,2,4,5,10,20,25,50,100 (todos los que 100/tiempoRampo no tiene resto, otros valores se pueden utilizar con resultado inexacto)
 */
-byte tiempoRampa=20;
+byte tiempoRampa=25;
 
 /*Para facilitar las cuentas no utilizaremos la hora y minuto de la salida y puesta del sol, sino lo que llamaremos "momento",
  * tal que:
@@ -79,8 +80,10 @@ void setup() {
   Serial.println("\n\n\nHola!");
 
   WiFi.begin(WIFI_NAME, WIFI_PASS);
+  Serial.print("Conectando a: ");
+  Serial.println(WIFI_NAME);
   while(WiFi.status() != WL_CONNECTED) {
-    delay(50 );
+    delay(500);
     Serial.print( "." );
   }
 
@@ -98,7 +101,9 @@ void setup() {
 
 void loop() {
   timeClient.update();
-  ArduinoOTA.handle();
+  if(brilloDimmer == 0 or brilloDimmer == 100) {
+    ArduinoOTA.handle();
+  }
 
   if (millis() - previousMillis >= 1000) {
     previousMillis = millis();
@@ -113,6 +118,10 @@ void loop() {
     ano = ptm->tm_year+1900-2000;
 
     momentoActual = hora*60 + minuto;
+    #ifdef LCD
+    lcd.setCursor(0,0);
+    lcd.print(formatedTimeInMinutesAsString(hora*3600 + minuto*60 + segundo) + " - " + String(brilloDimmer) + "%");
+    #endif
 
     if(minuto != minutoAnterior) {
       minutoAnterior = minuto;
@@ -144,6 +153,23 @@ void loop() {
     }
   }
 
+  //Cada vez que el valor del brillo se cambia, analizamos si debe estar apagado, encendido o dimerizando (cualquier punto medio).
+  //En caso de que esté totalmente encendido o apagado no tiene sentido ejecutar la interrupción del cruce por cero, y simplemente escribimos un 0 o un 1 en la salida conectada al triac.
+  if(brilloDimmer != brilloDimmerAnterior) {
+    Serial.println("Brillo Dimmer: "+String(brilloDimmer));
+    if(brilloDimmer == 0 or brilloDimmer == 100) {
+      detachInterrupt(12);
+      if(brilloDimmer == 0)
+        digitalWrite(14, LOW);
+      if(brilloDimmer == 100)
+        digitalWrite(14, HIGH);
+    }
+    else {
+      attachInterrupt(12, zeroCrosssInt, RISING);
+    }
+    brilloDimmerAnterior = brilloDimmer;
+  }
+
   if(dia != diaAnterior) {                                              //Cada vez que se cambia de día analizamos el momento de Sunrise y Sunset.
     TimeLord tardis;
     tardis.TimeZone(-3 * 60);                                           //-3 ya que la hora en Argentina es UTC-3
@@ -157,7 +183,7 @@ void loop() {
      Serial.print(":");
      Serial.println((int) today[tl_minute]);
      momentoSunrise = today[tl_hour]*60 + today[tl_minute];
-     momentoSunrise = 15*60 + 1;                                       //Para usar un valor falso de salida del sol y poder probar el funcionamiento del programa
+     momentoSunrise = 18*60 + 15;                                       //Para usar un valor falso de salida del sol y poder probar el funcionamiento del programa
      }
 
      if(tardis.SunSet(today))  {
@@ -166,7 +192,7 @@ void loop() {
      Serial.print(":");
      Serial.println((int) today[tl_minute]);
      momentoSunset = today[tl_hour]*60 + today[tl_minute];
-     momentoSunset = 15*60 + 32;                                        //Para usar un valor falso de puesta del sol y poder probar el funcionamiento del programa
+     //momentoSunset = 16*60 + 15;                                        //Para usar un valor falso de puesta del sol y poder probar el funcionamiento del programa
      }
 
     Serial.println("Momento Sunrise: "+String(momentoSunrise));
@@ -175,12 +201,12 @@ void loop() {
 
     if(diaAnterior == 0) {                                              //Detectamos el primer inicio del módulo (no existe un día 0
       Serial.println("Primer inicio");
+      minutoAnterior = 61;
       if(momentoActual > momentoSunrise and momentoActual < momentoSunset)
         brilloDimmer = 100;
       else
         brilloDimmer = 0;
     }
-
     diaAnterior = dia;
   }
 }
@@ -190,10 +216,10 @@ ICACHE_RAM_ATTR
 void zeroCrosssInt()  {
   byte _dimming = map(brilloDimmer,0,100,128,0);
 
-  if(_dimming<5 or _dimming>123) {
-    if(_dimming<5)
+  if(_dimming<10 or _dimming>120) {
+    if(_dimming<10)
       digitalWrite(14, HIGH);
-    if(_dimming>123)
+    if(_dimming>120)
       digitalWrite(14, LOW);
   }
   else {
