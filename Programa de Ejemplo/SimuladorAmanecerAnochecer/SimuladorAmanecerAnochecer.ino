@@ -27,6 +27,8 @@
 
 
 #define LCD                   //Descomente esta línea para utilizar el display LCD por I2C
+//#define MODO_INVERTIDO      //Descomente esta línea para activar el modo invertido, es decir que a la salida del sol se apague y en la puesta del sol se encienda.
+                              //Con este modo invertido se puede utilizar por ejemplo para luz tipo pasillo o LDR.
 
 #include "credenciales.h"       //En este archivo configuramos el nombre y contraseña de nuestra red wifi, además de la latitud y longitud para calcular la salida y puesta del sol.
 #include <ESP8266WiFi.h>
@@ -47,7 +49,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", -3*60*60);       //-3 ya que en Arg
 * y de 100% al 0% al momento de la puesta del sol.
 * Valores posibles: 1,2,4,5,10,20,25,50,100 (todos los que 100/tiempoRampo no tiene resto, otros valores se pueden utilizar con resultado inexacto)
 */
-byte tiempoRampa=20;
+byte tiempoRampa=100;
 
 /*Para facilitar las cuentas no utilizaremos la hora y minuto de la salida y puesta del sol, sino lo que llamaremos "momento",
  * tal que:
@@ -127,23 +129,31 @@ void loop() {
       minutoAnterior = minuto;
       Serial.println("\nHora actual: "+formatedTimeInMinutesAsString(hora*3600 + minuto*60 + segundo));
 
-      if(momentoActual >= momentoSunrise and momentoActual < momentoSunset) {     //Cuando alcanzamos el "momento" de la salida del sol (y aún es temprano para la puesta del sol), empezamos a aumentar el brillo de ser necesario
-        if(brilloDimmer<100) {                                                    //Vamos aumentando el brillo hasta llegar al 100%
-          byte step = 100/tiempoRampa;
-          brilloDimmer += step;
-          if(brilloDimmer > 100)
-            brilloDimmer = 100;
-        }
+      if(momentoActual >= momentoSunrise and momentoActual < momentoSunset) {     //Cuando alcanzamos el "momento" de la salida del sol (y aún es temprano para la puesta del sol),
+        byte step = 100/tiempoRampa;
+        //brilloDimmer += step;
+        #ifdef MODO_INVERTIDO
+        brilloDimmer -= step;                                                     //Empezamos a disminuir el brillo si está en modo invertido
+        #elif
+        brilloDimmer += step;                                                     //Empezamos a aumentar el brillo en modo normal
+        #endif
       }
 
-      if(momentoActual >= momentoSunset) {                                        //Cuando alcanzamos el momento de la puesta de sol,
-        if(brilloDimmer>0) {                                                      //vamos disminuyendo el brillo hasta llegar al 0% y queda totalmente apagado.
-          byte step = 100/tiempoRampa;
-          brilloDimmer -= step;
-          if(brilloDimmer < 0)
-            brilloDimmer = 0;
-        }
+      if(momentoActual >= momentoSunset) {                                        //Cuando alcanzamos el momento de la puesta de sol, vamos disminuyendo el brillo hasta llegar al 0% y queda totalmente apagado. Si está en modo invertido funciona al revés: lo va aumentando.
+        byte step = 100/tiempoRampa;
+        //brilloDimmer -= step;
+        #ifdef MODO_INVERTIDO
+        brilloDimmer += step;
+        #elif
+        brilloDimmer -= step;
+        #endif
       }
+
+      if(brilloDimmer > 100)
+        brilloDimmer = 100;
+      if(brilloDimmer < 0)
+        brilloDimmer = 0;
+
       #ifdef LCD
       lcd.clear();
       lcd.print(formatedTimeInMinutesAsString(hora*3600 + minuto*60 + segundo) + " - " + String(brilloDimmer) + "%");
@@ -203,9 +213,17 @@ void loop() {
       Serial.println("Primer inicio");
       minutoAnterior = 61;
       if(momentoActual > momentoSunrise and momentoActual < momentoSunset)
-        brilloDimmer = 100;
-      else
+        #ifdef MODO_INVERTIDO
         brilloDimmer = 0;
+        #elif
+        brilloDimmer = 100;
+        #endif
+      else
+        #ifdef MODO_INVERTIDO
+        brilloDimmer = 100;
+        #elif
+        brilloDimmer = 0;
+        #endif
     }
     diaAnterior = dia;
   }
