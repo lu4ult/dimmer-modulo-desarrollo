@@ -21,8 +21,8 @@
 
 #include <ESPRotary.h>
 ESPRotary encoder;
-#define ROTARY_PIN1 4      //CLK
-#define ROTARY_PIN2  5      //DT
+#define ROTARY_PIN1 13      //CLK
+#define ROTARY_PIN2  0      //DT
 #define ROTARY_SWITCH 2     //SW
 
 
@@ -63,17 +63,18 @@ void loop() {
   encoder.loop();
 
   encoderSwitch = !digitalRead(ROTARY_SWITCH);
-  if(encoderSwitch != encoderSwitchAnt) {
-    encoderSwitchAnt = encoderSwitch;
+  if(encoderSwitch != encoderSwitchAnt) {                                                     //Cuando detectamos que se presionó el pulsador del encoder,
+    encoderSwitchAnt = encoderSwitch;                                                         //Si estaba encendida la lámpara (cualquier valor entre 1 y 100%) la apagamos y visceversa.
     if(encoderSwitch) {
       if(brilloDimmer)
         brilloDimmer = 0;
       else
         brilloDimmer = 100;
     }
+    while(!digitalRead(ROTARY_SWITCH));                                                       //Esperamos que se deje de presionar para evitar falsos disparos
   }
 
-  if(brilloDimmer == 0 or brilloDimmer == 100) {
+  if(brilloDimmer == 0 or brilloDimmer == 100 and WiFi.status() == WL_CONNECTED) {
     ArduinoOTA.handle();
   }
 
