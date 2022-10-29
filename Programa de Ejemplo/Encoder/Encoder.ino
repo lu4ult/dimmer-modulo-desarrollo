@@ -21,8 +21,8 @@
 
 #include <ESPRotary.h>
 ESPRotary encoder;
-#define ROTARY_PIN1 0       //CLK
-#define ROTARY_PIN2  13     //DT
+#define ROTARY_PIN1 4      //CLK
+#define ROTARY_PIN2  5      //DT
 #define ROTARY_SWITCH 2     //SW
 
 
