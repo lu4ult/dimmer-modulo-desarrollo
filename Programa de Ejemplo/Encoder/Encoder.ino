@@ -3,7 +3,7 @@
  *
  *  En este ejemplo utilizamos un encoder rotativo (ky-040) para variar el brillo de la lámpara.
  *  Video en Youtube:
- *  <pendiente>
+ *  https://youtube.com/shorts/bcpSGGWcCMA
  *
 */
 
